@@ -1,22 +1,23 @@
+import{Constants} from "./Utility.js"
 import { LevelsManager } from './Levels.js';
 import { Player, EnemyManager } from './Entity.js';
 import { ObjManager } from './Objects.js';
 
 const canvas = document.querySelector("canvas")
 const c = canvas.getContext("2d")
-
 //constants
 canvas.width=innerWidth
 canvas.height=innerHeight
 
-const TILE_SIZE=innerHeight/8
-
-const player= new Player(canvas,0,0,TILE_SIZE,TILE_SIZE*1.5)
+const TILE_SIZE=innerHeight/7
+const constants = new Constants()
 const lvlManager = new LevelsManager(TILE_SIZE)
-const enemyManager = new EnemyManager(TILE_SIZE )
-const objManager = new ObjManager(TILE_SIZE)
-
 lvlManager.setLevel(1)
+
+const enemyManager = new EnemyManager(TILE_SIZE,lvlManager)
+const objManager = new ObjManager(TILE_SIZE)
+const player= new Player(canvas,0,0,TILE_SIZE*1.5,TILE_SIZE*1.5,TILE_SIZE,lvlManager)
+
 
 let dialogEnded=true
 let dialogStrings= new Array()
@@ -76,18 +77,17 @@ function gameLoop() {
 
 function update(){
     player.update()
-    /*enemy.update()
-    obj.update()*/
+    enemyManager.update()
+    //obj.update()
     checkBorder()
 }
 
 function draw() {
-    player.draw(c)
+    c.clearRect(0,0,canvas.width,canvas.height)
     lvlManager.draw(c)
-    /*enemy.draw(c)
-    obj.draw(c)*/
-    
-    
+    player.draw(c)
+    enemyManager.draw(c)
+    // obj.draw(c)
 }
 
 function checkBorder() {

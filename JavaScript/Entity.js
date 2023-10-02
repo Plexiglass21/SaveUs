@@ -16,11 +16,13 @@ class Hitbox {
     }
 }
 class Entity{
-    constructor(x,y,w,h){
+    constructor(x,y,w,h,lvlManager,TILE_SIZE){
         this.x=x
         this.y=y
         this.width=w
         this.height=h
+        this.lvlManager=lvlManager
+        this.TILE_SIZE=TILE_SIZE
     }
 
     initHitbox(w,h){
@@ -29,6 +31,41 @@ class Entity{
     drawHitbox(c){
         c.strokeStyle = "red";
         c.strokeRect(this.hitbox.x,this.hitbox.y,this.hitbox.width,this.hitbox.height)
+    }
+    
+    canMove(x,y,w,h){
+        if (!this.IsSolid(x, y))                        //angolo alto SX
+            if (!this.IsSolid(x + w, y + h))   //angolo basso DX
+                if (!this.IsSolid(x + w, y))        //angolo alto DX
+                    if (!this.IsSolid(x, y + h))   //angolo basso SX
+                        return true;
+            
+            return false;
+        
+    }
+
+    IsSolid(x,y){
+        let xTile=parseInt(x/this.TILE_SIZE)
+        let yTile=parseInt(y/this.TILE_SIZE)
+
+
+        let value = this.lvlManager.currentLvl.lvlCodes[yTile][xTile]
+        
+        return value!=0 && value!=2 && value!=4 && value!=5
+    }
+
+    GetPosUnderRoofOrAboveFloor(hitbox,airSpeed) {
+        let currentTile = parseInt(hitbox.y / this.TILE_SIZE);
+        if (airSpeed > 0) { 
+            // Falling - touching floor
+            let tileYPos = currentTile * this.TILE_SIZE;
+            let yOffset = parseInt (this.TILE_SIZE - hitbox.height);
+            return tileYPos - yOffset -1;
+        } else {
+            // Jumping
+            return currentTile * this.TILE_SIZE+130;
+        }
+            
     }
 }
 
@@ -45,11 +82,13 @@ const keys = {
 }
 
 const gravity=1.5;
-let index=0
-let tick=0
+let indexPl=0
+let tickPl=0
+let indexE=0
+let tickE=0
 export class Player extends Entity{
-    constructor(canvas,x,y,w,h){
-        super(x,y,w,h)
+    constructor(canvas,x,y,w,h,lvlManager,TILE_SIZE){
+        super(x,y,w,h,TILE_SIZE,lvlManager)
         this.vel=0
         this.walkSpeed=20
         this.jumpSpeed=-30
@@ -59,7 +98,7 @@ export class Player extends Entity{
 
         this.canvas=canvas
 
-        this.initHitbox(this.width,this.height)
+        this.initHitbox(128,this.height)
         this.caricaAssets()
         this.activeImg=this.idleImg
     }
@@ -88,15 +127,14 @@ export class Player extends Entity{
     }
     
     draw(c){
-        c.clearRect(0,0,this.canvas.width,this.canvas.height)
         if (keys.left.pressed) {
             // Rifletti l'immagine orizzontalmente
             c.save();
             c.scale(-1, 1);
-            c.drawImage(this.activeImg , index , 0 , 160 , this.activeImg.height , -this.hitbox.x - this.hitbox.width, this.hitbox.y, this.width, this.height);
+            c.drawImage(this.activeImg , indexPl , 0 , 48 , this.activeImg.height , -this.hitbox.x - this.hitbox.width, this.hitbox.y, this.width, this.height);
             c.restore();
         } else {
-           c.drawImage(this.activeImg , index , 0 , 160 , this.activeImg.height , this.hitbox.x, this.hitbox.y-180 , this.width*2.2, this.height*2.2)    //cord X(crop) , cordY(crop) , width(crop) , height(crop)  
+           c.drawImage(this.activeImg , indexPl , 0 , 48 , this.activeImg.height , this.hitbox.x, this.hitbox.y, this.width, this.height)    //cord X(crop) , cordY(crop) , width(crop) , height(crop)  
         }
         this.drawHitbox(c)        
     }
@@ -108,9 +146,19 @@ export class Player extends Entity{
     }
 
     updatePos(){
-        this.hitbox.y += this.vel
-        this.vel += gravity
-        if (this.hitbox.y + this.hitbox.height >= this.canvas.height-this.hitbox.height*1.4){
+
+        if(this.canMove(this.hitbox.x,this.hitbox.y,this.hitbox.width,this.hitbox.height)){
+            if(this.inAir){
+                this.hitbox.y += this.vel
+                this.vel += gravity
+            }
+
+        }else{
+            this.hitbox.y = this.GetPosUnderRoofOrAboveFloor(this.hitbox, this.vel);
+            this.inAir=false
+        }
+        
+        if (this.hitbox.y + this.hitbox.height >= this.canvas.height){
             this.inAir=false
             this.vel=0
         } 
@@ -119,17 +167,29 @@ export class Player extends Entity{
             this.jump()
             keys.jump.pressed=false
         }   
-        if(keys.right.pressed)  this.hitbox.x+=this.walkSpeed
-        if(keys.left.pressed)   this.hitbox.x-=this.walkSpeed
+
+        if(keys.right.pressed){
+            if(this.canMove(this.hitbox.x,this.hitbox.y,this.hitbox.width,this.hitbox.height)){
+                this.hitbox.x+=this.walkSpeed
+            }    
+        }
+             
+        if(keys.left.pressed){
+            if(this.canMove(this.hitbox.x,this.hitbox.y,this.hitbox.width,this.hitbox.height)){
+                this.hitbox.x-=this.walkSpeed
+            } 
+        }   
         
         keys.jump.pressed=false
+        
     }
+
     updateIndex(){
-        tick++
-        if(tick>=5){
-            tick=0
-            index+=160
-            if(index>=this.activeImg.width)index=0
+        tickPl++
+        if(tickPl>=5){
+            tickPl=0
+            indexPl+=48
+            if(indexPl>=this.activeImg.width)indexPl=0
         }   
     }
 
@@ -148,30 +208,98 @@ export class Player extends Entity{
         }
 
         if(app != this.activeImg ){
-            tick=0
-            index=0 
+            tickPl=0
+            indexPl=0 
         }
             
     }
 
-
     jump(){ 
         if(this.inAir) return
-        
         this.inAir=true
         this.vel=this.jumpSpeed
     }
 }
 
 export class EnemyManager{
-    constructor(tileSize){
+    constructor(tileSize,lvlManager){
         this.TILE_SIZE=tileSize
+        this.lvlManager=lvlManager
+        this.enemy1 = this.lvlManager.getEnemy1()
+
+    }
+
+    draw(c){
+        this.enemy1.forEach(element => {
+            c.drawImage(element.activeImg , indexE , 0 , 48 , element.activeImg.height , element.hitbox.x, element.hitbox.y, element.width, element.height)
+        });
+        
+    }
+
+    update(){
+        this.enemy1.forEach(element => {
+            element.update()
+        });
     }
 }
 
-class Enemy extends Entity {
-    constructor(){
+export class Enemy extends Entity {
+    constructor(x,y,w,h,lvlManager,enemyType){
+        super(x,y,w,h,lvlManager)
+        this.enemyType=enemyType;
+        this.walkSpeed=12
+        this.maxHealth=this.getMaxHealth();
+        this.currentHealth=this.maxHealth;
+        this.initHitbox()
+        this.caricaAssets()
+    }
 
-        
+    getMaxHealth(){
+        switch (this.enemyType) {
+            case "Covid":
+                return 50
+            default:
+                break;
+        }
+    }
+
+    caricaAssets(){
+        this.idleImg= new Image()
+        this.idleImg.src="/src/img/Idle.png"
+    }
+
+    update(){
+        this.updateIndex()
+        this.setAni()
+    }
+
+    updateIndex(){
+        tickE++
+        if(tickE>=10){
+            tickE=0
+            indexE+=48
+            if(indexE>=this.activeImg.width)indexE=0
+        }   
+    }
+
+    setAni(){
+        let app=this.activeImg
+        if(this.inAir){
+            if (this.vel<0) 
+                this.activeImg=this.jumpImg
+             /*else 
+                this.activeImg=this.fallImg*/
+        }else{
+            if(this.moving)
+                this.activeImg=this.runImg
+            else
+                this.activeImg=this.idleImg
+        }
+
+        if(app != this.activeImg ){
+            tickE=0
+            indexE=0 
+        }
+            
     }
 }
