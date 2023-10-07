@@ -10,7 +10,9 @@ canvas.width=innerWidth
 canvas.height=innerHeight
 
 const TILE_SIZE=innerHeight/7
-const constants = new Constants()
+
+const constants = new Constants(TILE_SIZE)
+
 const lvlManager = new LevelsManager(TILE_SIZE)
 lvlManager.setLevel(1)
 
@@ -18,13 +20,20 @@ const enemyManager = new EnemyManager(TILE_SIZE,lvlManager)
 const objManager = new ObjManager(TILE_SIZE)
 const player= new Player(canvas,0,0,TILE_SIZE*1.5,TILE_SIZE*1.5,TILE_SIZE,lvlManager)
 
+let rightBorder=0.8*innerWidth
+let leftBorder=0.2*innerWidth
+let lvlTilesWide=constants.TILES_GAME_WIDTH
+let maxTilesOffset=lvlTilesWide-constants.TILES_IN_WIDTH;
+let maxLvlOffsetX=maxTilesOffset*TILE_SIZE;
+let xLvlOffset=0
 
-let dialogEnded=true
+
+let dialogEnded=false
 let dialogStrings= new Array()
 let indexDialog=0
 
-//dialogs()
-gameLoop()
+dialogs()
+//gameLoop()
 
 function dialogs(){ 
     setTimeout(() => {
@@ -84,18 +93,27 @@ function update(){
 
 function draw() {
     c.clearRect(0,0,canvas.width,canvas.height)
-    lvlManager.draw(c)
-    player.draw(c)
-    enemyManager.draw(c)
-    // obj.draw(c)
+    lvlManager.draw(c,xLvlOffset)
+    player.draw(c,xLvlOffset)
+    enemyManager.draw(c,xLvlOffset)
+    // obj.draw(c,xLvlOffset)
 }
 
 function checkBorder() {
-    if (player.hitbox.x<0) {
+    let playerX= parseInt(player.hitbox.x)
+    let diff=playerX-xLvlOffset
+
+    if (playerX<0) {
         player.hitbox.x=0
         player.walkSpeed=0  
     }
     else player.walkSpeed=10
+   
+    if(diff>rightBorder) xLvlOffset+=diff-rightBorder
+    else if(diff<leftBorder)xLvlOffset+=diff-leftBorder
+        
+    if(xLvlOffset>maxLvlOffsetX) xLvlOffset=maxLvlOffsetX
+    else if(xLvlOffset<0) xLvlOffset=0
 }
 
 addEventListener("keydown", ({ key })=>{

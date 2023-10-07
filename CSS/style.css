@@ -1,11 +1,14 @@
 /* FONT */
-@font-face {
+/* @font-face {
   font-family: 'Chopsic-K6D';
   src: url('/src/Font/Chopsic-K6Dp.ttf') format('truetype');
-}
+} */
+
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans&family=Roboto:wght@100&display=swap');
 
 body {
-  font-family: 'Chopsic-K6D', sans-serif; /* Fallback a sans-serif se MyCustomFont non può essere caricato */
+  /* font-family: 'Chopsic-K6D', sans-serif; */
+  font-family: "Pixelify Sans";
   background-color: #264653;
   color: #E9C46A;
 }
@@ -23,8 +26,11 @@ body {
   transform: translateY(-2rem);
 }
 
-:root {
-  --bs-gutter-x: 30rem;
+img {
+  width: min-content;  
+  height: 10rem;
+  width: 10rem;
+  margin: 0.5rem;
 }
 
 /* Card Principali */
@@ -90,6 +96,7 @@ body {
 }
   
   .inputbox input {
+    /* font-family: Arial, Helvetica, sans-serif; */
     position: relative;
     width: 100%;
     padding: 20px 10px 10px;

@@ -1,23 +1,50 @@
+/* FONT */
+@font-face {
+  font-family: 'Chopsic-K6D';
+  src: url('/src/Font/Chopsic-K6Dp.ttf') format('truetype');
+}
+
 body{
-    margin: 0;
+  font-family: 'Chopsic-K6D', sans-serif;
+  margin: 0;
 }
 
 canvas{
+  font-family: 'Chopsic-K6D', sans-serif;
   width: 90%;
   background-color: #c4b195;
 }
 
+@keyframes slideFromRight {
+  0% {
+      transform: translateX(200%); /* Posizione iniziale fuori dallo schermo a destra */
+      opacity: 0%;
+  }
+  100% {
+      transform: translateX(0); /* Posizione finale sulla schermata */
+      opacity: 100%;
+  }
+}
+
+@keyframes slideFromLeft {
+  0% {
+      transform: translateX(-100%); /* Posizione iniziale fuori dallo schermo a sinistra */
+      opacity: 0%;
+  }
+  100% {
+      transform: translateX(0); /* Posizione finale sulla schermata */
+      opacity: 100%;
+  }
+}
+
 .message-box {
     background-color: rgba(0, 0, 0, 0.7);
-    border: 2px solid #fff;
+    border: 0.01rem solid #fff;
     color: #fff;
-    width: 800px;
-    height: 200px;
-    padding: 10px;
+    padding: 2rem;
     opacity: 1;
-    position: absolute;
-    bottom: 20%; 
-    left: 450px;
+    position: relative;
+    top: 25rem; 
     transition: all 0.5s ease;
   }
 
@@ -26,47 +53,21 @@ canvas{
 }
 
 .character1-entry {
-    width: 300px;
-    height: 400px;
-    background-color: blue;
-    position: absolute;
-    top: 44%;
-    left: 5%;
-    transition: all 3s ease;
+    background-color: rgb(255, 0, 0);
+    position: relative;
+    top: 25rem;
+    transition: all 5s ease;
+    animation: slideFromLeft 2s forwards;
 
 }
 .character2-entry {
-    width: 300px;
-    height: 400px;
     background-color: blue;
-    position: absolute;
-    top: 44%;
-    left: 68%;
+    position: relative;
+    top: 25rem;
     transition: all 5s ease;
+    animation: slideFromRight 2s forwards;
 }
-  
-@keyframes character1Entry {
-    0% {
-      transform: translateX(-100%); /* Inizia fuori dal lato sinistro */
-      opacity: 0;
-    }
-    100% {
-      transform: translateX(0); /* Termina dentro il canvas */
-      opacity: 1;
-    }
-  }
-  
-  @keyframes character2Entry {
-    0% {
-      transform: translateX(100%); /* Inizia fuori dal lato destro */
-      opacity: 0;
-    }
-    100% {
-      transform: translateX(0); /* Termina dentro il canvas */
-      opacity: 1;
-    }
-  }
 
-  .invisible{
-    display: none;
-  }
+.invisible{
+  display: none;
+}
