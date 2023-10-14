@@ -1,134 +1,181 @@
-import{Constants} from "./Utility.js"
 import { LevelsManager } from './Levels.js';
 import { Player, EnemyManager } from './Entity.js';
 import { ObjManager } from './Objects.js';
 
 const canvas = document.querySelector("canvas")
-const c = canvas.getContext("2d")
+
 //constants
 canvas.width=innerWidth
 canvas.height=innerHeight
 
-const TILE_SIZE=innerHeight/7
+export class Constants{
+    constructor(){
+        this.GAME_WIDTH= innerWidth     //larghezza canvas
+        this.GAME_HEIGHT= innerHeight   //altezza canvas
+        this.TILES_IN_WIDTH = 15;      //blocchi visibili in larghezza
+        this.TILES_IN_HEIGHT = 7;     //blocchi visibili in altezza   
+        this.TILES_GAME_WIDTH = 60;    //blocchi totali livello in larghezza
+        this.TILES_GAME_HEIGHT = 7;   //blocchi totali livello in altezza
+        this.TILE_SIZE_HEIGHT=innerHeight/this.TILES_IN_HEIGHT     //altezza dei tile
+        this.TILE_SIZE_WIDTH= innerWidth/this.TILES_IN_WIDTH       //larghezza dei tile
 
-const constants = new Constants(TILE_SIZE)
+        this.PLAYER_HEIGHT=this.TILE_SIZE_HEIGHT*1.2
+        this.PLAYER_WIDTH=this.TILE_SIZE_WIDTH*1.2
 
-const lvlManager = new LevelsManager(TILE_SIZE)
-lvlManager.setLevel(1)
+        this.BOX_WIDTH=100
+        this.BOX_HEIGHT=100
+        this.COIN_WIDTH=70
+        this.COIN_HEIGHT=70
+        this.COVID_WIDTH=100
+        this.COVID_HEIGHT=100
 
-const enemyManager = new EnemyManager(TILE_SIZE,lvlManager)
-const objManager = new ObjManager(TILE_SIZE)
-const player= new Player(canvas,0,0,TILE_SIZE*1.5,TILE_SIZE*1.5,TILE_SIZE,lvlManager)
+        this.RIMBALZO=-15
+        this.SALTO=-30
+        this.PLAYER_WALK=10
 
-let rightBorder=0.8*innerWidth
-let leftBorder=0.2*innerWidth
-let lvlTilesWide=constants.TILES_GAME_WIDTH
-let maxTilesOffset=lvlTilesWide-constants.TILES_IN_WIDTH;
-let maxLvlOffsetX=maxTilesOffset*TILE_SIZE;
-let xLvlOffset=0
+        this.SIZE_ASSETS=128
 
-
-let dialogEnded=false
-let dialogStrings= new Array()
-let indexDialog=0
-
-dialogs()
-//gameLoop()
-
-function dialogs(){ 
-    setTimeout(() => {
-        document.getElementById('message-box').classList.add('message-box');
-    }, 1000);
-
-    switch (lvlManager.currentLvl.index) {
-        case 1:
-            dialogStrings=["What is your name?","Ezekial","Fuck you Ezekial!","Fuck you!!"]
-            break;
-        case 2:
-            dialogStrings=["ciao","ciao a te","suca","sucuni"]
-            break;
-        case 3:
-            dialogStrings=["ciao","ciao a te","suca","sucuni"]
-            break;
-        case 4:
-            dialogStrings=["ciao","ciao a te","suca","sucuni"]
-            break;
-        case 5:
-            dialogStrings=["ciao","ciao a te","suca","sucuni"]
-            break;
-    }
-
-    playDialog()
-}
-function playDialog() {
-
-    document.getElementById('character1').classList.add('character1-entry')
-    document.getElementById('character2').classList.add('character2-entry')
-    
-    document.getElementById("message-text").innerHTML= (indexDialog%2==0) ? "Guzzi: " + dialogStrings[indexDialog] : "Valastro: " + dialogStrings[indexDialog] 
-
-    if (indexDialog> dialogStrings.length-1) {
-        document.getElementById('character1').classList.add('invisible')
-        document.getElementById('character2').classList.add('invisible')
-        document.getElementById('message-box').classList.add('invisible')
-        dialogEnded=true
-        gameLoop()
+        this.COIN=8
+        this.BOX=7
     }
 }
+export class Game{
 
-function gameLoop() {
-    update()
-    draw()
-    setTimeout(() => {
-        requestAnimationFrame(gameLoop);
-    }, 16.67); // 1000 ms / 60 FPS = 16.67 ms
-}
+    constructor(canvas){
+        this.canvas=canvas
+        this.c = canvas.getContext("2d")
+        this.constants = new Constants();
+        this.lvlManager = new LevelsManager()
+        this.lvlManager.setLevel(1)
 
-function update(){
-    player.update()
-    enemyManager.update()
-    //obj.update()
-    checkBorder()
-}
-
-function draw() {
-    c.clearRect(0,0,canvas.width,canvas.height)
-    lvlManager.draw(c,xLvlOffset)
-    player.draw(c,xLvlOffset)
-    enemyManager.draw(c,xLvlOffset)
-    // obj.draw(c,xLvlOffset)
-}
-
-function checkBorder() {
-    let playerX= parseInt(player.hitbox.x)
-    let diff=playerX-xLvlOffset
-
-    if (playerX<0) {
-        player.hitbox.x=0
-        player.walkSpeed=0  
-    }
-    else player.walkSpeed=10
-   
-    if(diff>rightBorder) xLvlOffset+=diff-rightBorder
-    else if(diff<leftBorder)xLvlOffset+=diff-leftBorder
+        this.player= new Player(this.canvas,0,0,this.constants.PLAYER_WIDTH,this.constants.PLAYER_HEIGHT,this.lvlManager,this)
+        this.enemyManager = new EnemyManager(this.lvlManager,this.player)
         
-    if(xLvlOffset>maxLvlOffsetX) xLvlOffset=maxLvlOffsetX
-    else if(xLvlOffset<0) xLvlOffset=0
+        this.objManager = new ObjManager(this.lvlManager,this.player)
+
+        this.rightBorder=0.8*this.canvas.width
+        this.leftBorder=0.2*this.canvas.width
+        this.lvlTilesWide=this.constants.TILES_GAME_WIDTH
+        this.maxTilesOffset=this.lvlTilesWide-this.constants.TILES_IN_WIDTH;
+        this.maxLvlOffsetX=this.maxTilesOffset*this.constants.TILE_SIZE_WIDTH;
+        this.xLvlOffset=0
+
+        this.dialogEnded=true
+        this.dialogStrings= new Array()
+        this.indexDialog=0
+
+        //this.dialogs()
+        this.gameLoop()
+
+    }
+
+    dialogs(){ 
+        setTimeout(() => {
+            document.getElementById('message-box').classList.add('message-box');
+        }, 1000);
+    
+        switch (lvlManager.currentLvl.index) {
+            case 1:
+                this.dialogStrings=["What is your name?","Ezekial","Fuck you Ezekial!","Fuck you!!"]
+                break;
+            case 2:
+                this.dialogStrings=["ciao","ciao a te","suca","sucuni"]
+                break;
+            case 3:
+                this.dialogStrings=["ciao","ciao a te","suca","sucuni"]
+                break;
+            case 4:
+                this.dialogStrings=["ciao","ciao a te","suca","sucuni"]
+                break;
+            case 5:
+                this.dialogStrings=["ciao","ciao a te","suca","sucuni"]
+                break;
+        }
+    
+        this.playDialog()
+    }
+
+    playDialog() {
+    
+        document.getElementById('character1').classList.add('character1-entry')
+        document.getElementById('character2').classList.add('character2-entry')
+        
+        document.getElementById("message-text").innerHTML= (indexDialog%2==0) ? "Guzzi: " + dialogStrings[indexDialog] : "Valastro: " + dialogStrings[indexDialog] 
+    
+        if (this.indexDialog> this.dialogStrings.length-1) {
+            document.getElementById('character1').classList.add('invisible')
+            document.getElementById('character2').classList.add('invisible')
+            document.getElementById('message-box').classList.add('invisible')
+            this.dialogEnded=true
+            this.gameLoop()
+        }
+    }
+
+    gameLoop() {
+        this.draw()
+        this.update()
+        
+        setTimeout(() => {
+            requestAnimationFrame(this.gameLoop.bind(this));
+        }, 16.67); // 1000 ms / 60 FPS = 16.67 ms
+    }
+    
+    update(){
+        this.player.update()
+        this.enemyManager.update()
+        this.objManager.update()
+        this.checkBorder()
+    }
+    
+    draw() {
+        this.c.clearRect(0,0,this.canvas.width,this.canvas.height)
+        this.lvlManager.draw(this.c,this.xLvlOffset)
+        this.player.draw(this.c,this.xLvlOffset)
+        this.enemyManager.draw(this.c,this.xLvlOffset)
+        this.objManager.draw(this.c,this.xLvlOffset)
+    }
+    
+    checkBorder() {
+        let playerX= parseInt(this.player.hitbox.x)
+        let diff=playerX-this.xLvlOffset
+
+        if (playerX<0) {
+            this.player.hitbox.x=0
+            this.player.walkSpeed=0  
+        }
+        else this.player.walkSpeed=this.constants.PLAYER_WALK
+        if(diff>this.rightBorder)
+            this.xLvlOffset+=diff-this.rightBorder
+        
+        else if(diff<this.leftBorder)this.xLvlOffset+=diff-this.leftBorder
+            
+        if(this.xLvlOffset>this.maxLvlOffsetX) this.xLvlOffset=this.maxLvlOffsetX
+        else if(this.xLvlOffset<0) this.xLvlOffset=0
+    }
+
+    checkEnemyHit(hitbox){
+        this.enemyManager.checkEnemyHit(hitbox)
+    }
+    checkObjectHit(hitbox){
+        this.objManager.checkObjectHit(hitbox)
+    }
 }
+
+const game = new Game(canvas)
 
 addEventListener("keydown", ({ key })=>{
     //console.log(keyCode)
     switch (key) {
         case "d":
-            player.setRight(true)
+            game.player.setRight(true)
             break;
         case "a":
-            player.setLeft(true)
+            game.player.setLeft(true)
             break;
         case " ":
-            if(dialogEnded)player.setJump(true)
+            if(game.dialogEnded)game.player.setJump(true)
             else {
-                indexDialog++
+                game.indexDialog++
                 playDialog()
             }
 
@@ -140,10 +187,10 @@ addEventListener("keydown", ({ key })=>{
 addEventListener("keyup", ({ key })=>{
     switch (key) {
         case "d":
-            player.setRight(false)
+            game.player.setRight(false)
             break;
         case "a":
-            player.setLeft(false)
+            game.player.setLeft(false)
             break;
     }
 
