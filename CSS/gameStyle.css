@@ -7,6 +7,7 @@
 body{
   font-family: 'Chopsic-K6D', sans-serif;
   margin: 0;
+  background-color: grey;
 }
 
 canvas{

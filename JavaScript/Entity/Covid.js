@@ -25,6 +25,8 @@ class Covid extends Enemy{
                 if (this.canSeePlayer()) {
                     const distanceToPlayer = player.position.x - this.position.x 
                     this.velocity.x = (distanceToPlayer > 0) ? this.walkSpeed : -this.walkSpeed
+                }else{
+                    
                 }
                 break
             case 'attack':
@@ -57,7 +59,6 @@ class Covid extends Enemy{
                 //sinistra
                 if(this.velocity.x<0){
                     let offset = this.hitbox.position.x - this.position.x 
-                    
                     this.position.x= block.position.x+block.width-offset + 0.01
                     this.dir=1
                     break
@@ -99,14 +100,28 @@ class Covid extends Enemy{
     canSeePlayer(){
         let absX=Math.abs( (player.position.x/TileWidth) - (this.position.x/TileWidth) )
         let absY=Math.abs( (player.position.y/TileWidth) - (this.position.y/TileWidth) )
-        if(absY>=3) return false
-        return absX<=5
+
+        if(absX>=3) return false
+        return (absX<=5 && this.isClear())
+    }
+
+    isClear(){
+        this.collisionBlocks.forEach(block => {
+            if(this.dir===1){
+                if(this.position.x+this.width<=block.position.x){
+                    console.log(block.position.x);
+                    return false
+                } 
+            }else{
+                if(this.position.x<=block.position.x) return false
+            }
+        });   
     }
 
     updateHitbox(){
         this.hitbox={
             position: {
-                x:this.position.x+40,
+                x:this.position.x+52,
                 y:this.position.y+70,
             },
             width:45,

@@ -12,6 +12,7 @@ class Player extends Sprite{
         this.platformCollisionBlocks=platformCollisionBlocks
         this.objectBlocks=objectBlocks
         this.enemyBlock=enemyBlock
+        this.die=false
         this.hitbox={
             position: {
                 x:this.position.x,
@@ -66,7 +67,7 @@ class Player extends Sprite{
     updateHitbox(){
         this.hitbox={
             position: {
-                x:this.position.x +35,
+                x:this.position.x+45,
                 y:this.position.y+13,
             },
             width:55,
@@ -106,21 +107,23 @@ class Player extends Sprite{
             let objOffset=block.image.height-block.height+12
             
             if (objCollisions({ object1:this.hitbox, object2:block, offset:objOffset,})){
-                if(this.velocity.x>0){
-                    this.velocity.x=0
-                    let offset = this.hitbox.position.x - this.position.x + this.hitbox.width
-
-                    this.position.x= block.position.x-offset - 0.01
-                    break
-                } 
-
-                else if(this.velocity.x<0){
-                    this.velocity.x=0
-                    let offset = this.hitbox.position.x - this.position.x 
-                    
-                    this.position.x= block.position.x+block.width-offset + 0.01
-                    break
-                } 
+                if(block.code===1){
+                    if(this.velocity.x>0){
+                        this.velocity.x=0
+                        let offset = this.hitbox.position.x - this.position.x + this.hitbox.width
+    
+                        this.position.x= block.position.x-offset - 0.01
+                        break
+                    } 
+    
+                    else if(this.velocity.x<0){
+                        this.velocity.x=0
+                        let offset = this.hitbox.position.x - this.position.x 
+                        
+                        this.position.x= block.position.x+block.width-offset + 0.01
+                        break
+                    } 
+                }
             }
         }
 
@@ -191,17 +194,19 @@ class Player extends Sprite{
                     object2:block,
                     offset:objOffset,}
                     )){
-                    if(this.velocity.y>0 ){
-                        this.bounce()
-                        block.active=false
-                    }
-                    else if(this.velocity.y<0){
-                        this.velocity.y=0
-                        let offset = this.hitbox.position.y - this.position.y
-
-                        this.position.y= block.position.y+block.height -offset + 0.01
-                        break
-                    } 
+                        if (block.code===1) {
+                            if(this.velocity.y>0 ){
+                                this.bounce()
+                                block.active=false
+                            }
+                            else if(this.velocity.y<0){
+                                this.velocity.y=0
+                                let offset = this.hitbox.position.y - this.position.y
+        
+                                this.position.y= block.position.y+block.height -offset + 0.01
+                                break
+                            }   
+                        }
                 }
         }
 
@@ -224,7 +229,7 @@ class Player extends Sprite{
     }
 
     bounce(){
-        this.velocity.y=-jumpPlayer/1.5
+        this.velocity.y=-jumpPlayer/1.2
     }
 
     playerHitted(enemy){
@@ -233,5 +238,10 @@ class Player extends Sprite{
                 this.hp-=10
                 break;
         }
+
+        if(this.hp<=0){
+            this.die=true
+            this.switchSprite('Death')
+        } 
     }
 }

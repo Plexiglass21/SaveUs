@@ -5,7 +5,7 @@ const c= canvas.getContext("2d")
 canvas.width=innerWidth-30
 canvas.height=innerHeight-30
 
-const TileInWidth=60
+const TileInWidth=73
 const TileVisibleInWidth=15
 const TileInHeight=7
 const TileHeight=innerHeight/TileInHeight
@@ -145,6 +145,11 @@ const player= new Player({
             frameRate:3,
             frameBuffer:20,
         },
+        Death:{
+            src:'/src/img/death-guz.png',
+            frameRate:10,
+            frameBuffer:12,
+        }
     }
 })
 
@@ -165,13 +170,14 @@ function animate() {
     c.clearRect(0,0,canvas.width, canvas.height)
     c.save()
     checkBorder()
-    player.update(xLvlOffset)
+    
 
     collisionBlocks.forEach(collisionBlocks =>{collisionBlocks.draw(xLvlOffset)})
     platformCollisionBlocks.forEach(collisionBlocks =>{collisionBlocks.draw(xLvlOffset)})
     objectBlocks.forEach(object => {object.update(xLvlOffset)})
     enemyBlocks.forEach(enemy =>{enemy.update(xLvlOffset)})
-
+    player.update(xLvlOffset)
+    
     player.velocity.x=0
     if(keys.right.pressed){
         player.lastDir='right'
@@ -183,7 +189,7 @@ function animate() {
         player.switchSprite('Run')
         player.velocity.x=-5
     } 
-    else if(player.velocity.y===0) player.switchSprite('Idle')
+    else if(player.velocity.y===0 && !player.die) player.switchSprite('Idle')
 
     if(player.velocity.y<0) player.switchSprite('Jump')
 
@@ -223,8 +229,10 @@ window.addEventListener('keydown', (event) =>{
             break;
         case ' ':
             if(!keys.jump.pressed){
-                player.velocity.y=-jumpPlayer
-                keys.jump.pressed=true
+                if(player.velocity.y==0){
+                    player.velocity.y=-jumpPlayer
+                    keys.jump.pressed=true
+                }
             }
             break;
     }
