@@ -3,23 +3,25 @@ class Sprite{
         this.position=position
         this.loaded=false
         this.image=new Image()
+        //dopo aver caricato l'img
         this.image.onload=()=>{
-            this.width=TileInWidth*2
+            this.width=TileWidth*1.5
             this.height=TileHeight*1.5
             this.loaded=true
         }
         this.image.src=src
-        this.frameRate=frameRate
+        this.frameRate=frameRate    //numero sprite
         this.currentFrame=0
-        this.frameBuffer=frameBuffer
-        this.elapsedframe=0
-        this.lastDir='right'
+        this.frameBuffer=frameBuffer    //valore per rallentamento animazione
+        this.elapsedframe=0             //tile trascorsi
+        this.lastDir='right'            
         this.hp=100
     }
 
     draw(xLvlOffset){
         if(!this.image) return
-        
+
+        //oggeto che ritaglia lo sprite del player per disegnare un'immagine più piccola
         const cropBox = {
             position: {
                 x:this.currentFrame * (this.image.width/this.frameRate),
@@ -56,6 +58,7 @@ class Sprite{
             c.restore();
         }
 
+        //scrittura hp
         if(this.hp<0)this.hp=0
         c.font='50px serif'
         c.fillText('HP: ' +this.hp,10,50)

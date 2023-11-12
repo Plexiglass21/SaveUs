@@ -4,8 +4,8 @@ class GameObject{
         this.position=position
         this.height=height
         this.width=width
-        this.code=code
-        this.active=true
+        this.code=code      //identifica il tipo di oggetto
+        this.active=true    //true: esiste
         this.hitbox={
             position: {
                 x:this.position.x,

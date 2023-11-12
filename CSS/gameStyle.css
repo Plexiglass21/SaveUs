@@ -1,72 +1,9 @@
-/* FONT */
-@font-face {
-  font-family: 'Chopsic-K6D';
-  src: url('/src/Font/Chopsic-K6Dp.ttf') format('truetype');
-}
 
-body{
-  font-family: 'Chopsic-K6D', sans-serif;
-  margin: 0;
-  background-color: grey;
-}
 
 canvas{
   font-family: 'Chopsic-K6D', sans-serif;
   width: 90%;
   background-color: #c4b195;
-}
-
-@keyframes slideFromRight {
-  0% {
-      transform: translateX(200%); /* Posizione iniziale fuori dallo schermo a destra */
-      opacity: 0%;
-  }
-  100% {
-      transform: translateX(0); /* Posizione finale sulla schermata */
-      opacity: 100%;
-  }
-}
-
-@keyframes slideFromLeft {
-  0% {
-      transform: translateX(-100%); /* Posizione iniziale fuori dallo schermo a sinistra */
-      opacity: 0%;
-  }
-  100% {
-      transform: translateX(0); /* Posizione finale sulla schermata */
-      opacity: 100%;
-  }
-}
-
-.message-box {
-    background-color: rgba(0, 0, 0, 0.7);
-    border: 0.01rem solid #fff;
-    color: #fff;
-    padding: 2rem;
-    opacity: 1;
-    position: relative;
-    top: 25rem; 
-    transition: all 0.5s ease;
-  }
-
-.message-text{
-  font-size: 30px;
-}
-
-.character1-entry {
-    background-color: rgb(255, 0, 0);
-    position: relative;
-    top: 25rem;
-    transition: all 5s ease;
-    animation: slideFromLeft 2s forwards;
-
-}
-.character2-entry {
-    background-color: blue;
-    position: relative;
-    top: 25rem;
-    transition: all 5s ease;
-    animation: slideFromRight 2s forwards;
 }
 
 .invisible{

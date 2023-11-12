@@ -3,7 +3,7 @@ class CollisonBlock{
         this.position=position
         this.width=width
         this.height=height
-        this.type=type
+        this.type=type      //identifica il tipo di blocco
         this.img=new Image()
         this.setAssets()
     }
@@ -20,6 +20,8 @@ class CollisonBlock{
     }
 
     draw(xLvlOffset){
+        c.fillStyle = 'rgba(0, 255, 0, 0.2)'
+        c.fillRect(this.position.x-xLvlOffset, this.position.y, this.width, this.height)
         c.drawImage(
             this.img,
             this.position.x-xLvlOffset,

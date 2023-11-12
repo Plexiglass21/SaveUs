@@ -1,10 +1,10 @@
 class Covid extends Enemy{
     constructor({position, collisionBlocks,platformCollisionBlocks,objectBlocks,src,type}){
         super({position, collisionBlocks,platformCollisionBlocks,objectBlocks,src,type})
-        this.frameRate=8
-        this.frameBuffer=18
+        this.frameRate=8    //numero di sprite
+        this.frameBuffer=18 //valore per rallentamento animazione
         this.width=60
-        this.dir=1
+        this.dir=1          //direzione  1:dx / -1:sx
         this.animations={
             Idle:{
                 src:'/src/img/idle-19.png',
@@ -13,10 +13,14 @@ class Covid extends Enemy{
             }
         }
         this.walkSpeed=2
+        this.xOffsetHitBox=52
+        this.yOffsetHitBox=70
+        this.hitboxWidth=45
+        this.hitboxHeight=65
     }
 
+    //gestione del comportamento secondo degli eventi specifici
     updateBehavior(){
-
         switch (this.state) {
             case 'idle':
                 this.state='run'
@@ -26,14 +30,13 @@ class Covid extends Enemy{
                     const distanceToPlayer = player.position.x - this.position.x 
                     this.velocity.x = (distanceToPlayer > 0) ? this.walkSpeed : -this.walkSpeed
                 }else{
-                    
+                    this.velocity.x=this.walkSpeed *this.dir
                 }
                 break
-            case 'attack':
-                break;
         }
     }
 
+    //gestione collisioni orizzonatali
     checkForHorizzontalCollision(){
         if (this.hitbox.position.x<0){
             this.velocity.x=0
@@ -97,35 +100,23 @@ class Covid extends Enemy{
         }
     }
 
+    //controlla se il player è nel campo visivo dell'enemy
     canSeePlayer(){
         let absX=Math.abs( (player.position.x/TileWidth) - (this.position.x/TileWidth) )
         let absY=Math.abs( (player.position.y/TileWidth) - (this.position.y/TileWidth) )
 
         if(absX>=3) return false
-        return (absX<=5 && this.isClear())
-    }
-
-    isClear(){
-        this.collisionBlocks.forEach(block => {
-            if(this.dir===1){
-                if(this.position.x+this.width<=block.position.x){
-                    console.log(block.position.x);
-                    return false
-                } 
-            }else{
-                if(this.position.x<=block.position.x) return false
-            }
-        });   
+        return (absX<=5)
     }
 
     updateHitbox(){
         this.hitbox={
             position: {
-                x:this.position.x+52,
-                y:this.position.y+70,
+                x:this.position.x+this.xOffsetHitBox,
+                y:this.position.y+this.yOffsetHitBox,
             },
-            width:45,
-            height:65,
+            width:this.hitboxWidth,
+            height:this.hitboxHeight,
         }
     }
 }

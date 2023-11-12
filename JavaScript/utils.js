@@ -1,3 +1,5 @@
+/*la funzione controlla se si verifica un a collisione tra i due oggetti passati.
+  Controlla tutti i lati.*/
 function collision({ object1, object2 }) {
     return (
       object1.position.y + object1.height >= object2.position.y &&
@@ -6,7 +8,8 @@ function collision({ object1, object2 }) {
       object1.position.x + object1.width >= object2.position.x
     )
   }
-
+/*la funzione controlla se si verifica un a collisione tra i due oggetti passati.
+  Controlla tutti i lati tranne la collisione dal basso.*/
   function platformCollisions({ object1, object2 }) {
     return (
       object1.position.y + object1.height >= object2.position.y &&

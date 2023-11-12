@@ -11,9 +11,9 @@ class Enemy extends Sprite{
         this.collisionBlocks=collisionBlocks
         this.platformCollisionBlocks=platformCollisionBlocks
         this.objectBlocks=objectBlocks
-        this.type=type
-        this.active=true
-        this.state='idle'
+        this.type=type      //identifica il tipo di enemy
+        this.active=true    //true: esiste
+        this.state='idle'   //stati: idle,run,attack....
         this.hitbox={
             position: {
                 x:this.position.x,
@@ -23,6 +23,7 @@ class Enemy extends Sprite{
             height:50,
         }
 
+        //popola l'array animation(classe Sprite) con le immagini che sono arrivate in input
         for(let key in this.animations){
             const image= new Image()
             image.src=this.animations[key].src
@@ -30,6 +31,7 @@ class Enemy extends Sprite{
         }
     }
 
+    //gestione cambio sprite
     switchSprite(key){
         if(this.image===this.animations[key].image || !this.loaded) return
 
@@ -39,6 +41,7 @@ class Enemy extends Sprite{
         this.frameRate = this.animations[key].frameRate
     }
 
+    //controlli e disegno
     update(xLvlOffset){
         this.updateFrames()
 
@@ -77,13 +80,14 @@ class Enemy extends Sprite{
             cropBox.position.y,
             cropBox.width,
             cropBox.height,
-            this.position.x-xLvlOffset,
+            this.position.x-xLvlOffset-25,
             this.position.y,
             this.width,
             this.height)
         
     }
 
+    //controllo collisioni orizzontali
     checkForHorizzontalCollision(){
 
         for (let i = 0; i < this.collisionBlocks.length; i++) {
@@ -140,11 +144,13 @@ class Enemy extends Sprite{
         }
     }
 
+    //modifica la cordinata y con la gravità
     applyGravity(){
         this.velocity.y+=gravity
         this.position.y+=this.velocity.y
     }
 
+    //controllo collisioni verticali
     checkForVerticalCollision(){
         for (let i = 0; i < this.collisionBlocks.length; i++) {
             const block = this.collisionBlocks[i];

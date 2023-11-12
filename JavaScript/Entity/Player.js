@@ -29,8 +29,15 @@ class Player extends Sprite{
             image.src=this.animations[key].src
             this.animations[key].image= image
         }
+
+        this.walkSpeed=5
+        this.xOffsetHitBox=45
+        this.yOffsetHitBox=13
+        this.hitboxWidth=100
+        this.hitboxHeight=150
     }
 
+    //gestione cambio sprite
     switchSprite(key){
 
         if(this.image===this.animations[key].image || !this.loaded) return
@@ -67,14 +74,15 @@ class Player extends Sprite{
     updateHitbox(){
         this.hitbox={
             position: {
-                x:this.position.x+45,
-                y:this.position.y+13,
+                x:this.position.x+this.xOffsetHitBox,
+                y:this.position.y+this.yOffsetHitBox,
             },
-            width:55,
-            height:150,
+            width:this.hitboxWidth,
+            height:this.hitboxHeight,
         }
     }
 
+    //controllo collisioni orizzonatali
     checkForHorizzontalCollision(){
         for (let i = 0; i < this.collisionBlocks.length; i++) {
             const block = this.collisionBlocks[i];
@@ -141,6 +149,7 @@ class Player extends Sprite{
         this.position.y+=this.velocity.y
     }
 
+    //controllo collisioni verticali
     checkForVerticalCollision(){
         for (let i = 0; i < this.collisionBlocks.length; i++) {
             const block = this.collisionBlocks[i];
@@ -228,10 +237,12 @@ class Player extends Sprite{
         }
     }
 
+    //modifica la cordinata y per creare un leggero salto
     bounce(){
         this.velocity.y=-jumpPlayer/1.2
     }
 
+    //gestisce l'evento "colpito" del player
     playerHitted(enemy){
         switch (enemy.type) {
             case 'covid':
@@ -242,6 +253,6 @@ class Player extends Sprite{
         if(this.hp<=0){
             this.die=true
             this.switchSprite('Death')
-        } 
+        }
     }
 }
