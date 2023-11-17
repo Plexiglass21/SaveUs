@@ -6,9 +6,12 @@ const c= canvas.getContext("2d")
 canvas.width=innerWidth-30      
 canvas.height=innerHeight-30
 
+const canvasImg= new Image()
+canvasImg.src='/src/img/LV_1/background.png'
+
 const TileInWidth=150       //numero tile livello in larghezza
 const TileVisibleInWidth=15 //numero tile in larghezza visibli nel canvas
-const TileInHeight=7        //numeor tile in altezza
+const TileInHeight=7        //numero tile in altezza
 const TileHeight=innerHeight/TileInHeight       //altezza tile
 const TileWidth=innerWidth/TileVisibleInWidth   //larghezza tile
 const jumpPlayer=TileHeight/8                   //salto player
@@ -81,18 +84,47 @@ const objectBlocks=[]
 object2D.forEach((row,y) => {
     row.forEach((value,x) => {
         if (value !== 0) {
-            objectBlocks.push(
-            new GameObject({
-                position:{
-                    x:x*TileWidth,
-                    y:y*TileHeight,
-                },
-                src:'img/LV_1/box.png',
-                width:100,
-                height:100,
-                code:value
-            })
-            )
+            if(value===3){
+                objectBlocks.push(
+                    new GameObject({
+                        position:{
+                            x:x*TileWidth,
+                            y:y*TileHeight,
+                        },
+                        src:'img/LV_1/box.png',
+                        width:1024,
+                        height:256,
+                        code:value
+                    })
+                    )
+            }else if(value===5){
+                objectBlocks.push(
+                    new GameObject({
+                        position:{
+                            x:x*TileWidth,
+                            y:y*TileHeight,
+                        },
+                        src:'img/LV_1/box.png',
+                        width:100,
+                        height:100,
+                        code:value
+                    })
+                    )
+            }else{
+                objectBlocks.push(
+                    new GameObject({
+                        position:{
+                            x:x*TileWidth,
+                            y:y*TileHeight,
+                        },
+                        src:'img/LV_1/box.png',
+                        width:100,
+                        height:100,
+                        code:value
+                    })
+                    )
+            }
+            
         }
     })
 });
@@ -205,7 +237,6 @@ function checkBorder(){
 
 animate()
 
-
 //ascoltatori click tastiera
 window.addEventListener('keydown', (event) =>{
     switch (event.key) {
@@ -247,12 +278,14 @@ function livello() {
     window.requestAnimationFrame(animate)  //crea il loop
     c.clearRect(0,0,canvas.width, canvas.height)// pulisce il canvas
     c.save()    //salva la condizione attuale del canvas
+    c.drawImage(canvasImg,0,0,canvas.width,canvas.height)
     checkBorder()
+    
         
     //disegna il livello
+    objectBlocks.forEach(object => {object.update(xLvlOffset)})
     collisionBlocks.forEach(collisionBlocks =>{collisionBlocks.draw(xLvlOffset)})
     platformCollisionBlocks.forEach(collisionBlocks =>{collisionBlocks.draw(xLvlOffset)})
-    objectBlocks.forEach(object => {object.update(xLvlOffset)})
     enemyBlocks.forEach(enemy =>{enemy.update(xLvlOffset)})
     player.update(xLvlOffset)
         

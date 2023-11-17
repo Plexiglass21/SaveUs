@@ -22,24 +22,19 @@ class GameObject{
                 this.image.src='/src/img/LV_1/radiator.png'
                 break;
             case 3:
-                this.image.src='/src/img/LV_1/window_right.png'
+                this.image.src='/src/img/LV_1/window.png'
                 break;
             case 4:
-                this.image.src='/src/img/LV_1/window_left.png'
-                break;
-            case 5:
                 this.image.src='/src/img/LV_1/muro_empty.png'
                 break;
-            case 6:
+            case 5:
                 this.image.src='/src/img/LV_1/sedia.png'
                 break;
-            case 7:
+            case 6:
                 this.image.src='/src/img/LV_1/tavolo.png'
                 break;
-            case 8:
+            case 7:
                 this.image.src='/src/img/LV_1/pc_coin.png'
-                break;
-            default:
                 break;
         }
     }
